@@ -1,7 +1,7 @@
 name: astrbot_plugin_dnf_gold
-desc: "DNF跨5区金价实时看板，支持UU898/DD373比价。"
+desc: "DNF跨5区金价实时看板，使用YXDR聚合数据并保留UU898兜底。"
 author: "qingcai"
-version: "1.0.0"
+version: "1.1.0"
 
 repo: "https://github.com/yunko1993/astrbot_plugin_dnf_gold"
 
