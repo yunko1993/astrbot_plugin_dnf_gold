@@ -3,6 +3,7 @@ import unittest
 from yxdr_source import (
     DEFAULT_OFFER_LIMIT,
     build_secret_signature,
+    build_offer_messages,
     extract_json_assignment,
     extract_script_src,
     format_gold_offer,
@@ -57,6 +58,28 @@ class YxdrSourceTest(unittest.TestCase):
         offer = {"ListUrl": "https://www.dd373.com/s/example.html"}
 
         self.assertEqual("https://www.dd373.com/s/example.html", offer_url(offer))
+
+    def test_build_offer_messages_splits_top_twenty_into_five_item_messages(self):
+        items = []
+        for index in range(20):
+            items.append(
+                {
+                    "platform": "DD373",
+                    "offer": {
+                        "Price": 0.016,
+                        "Amount": 1000,
+                        "Money": 16,
+                        "BuyUrl": f"https://example.com/{index}",
+                    },
+                }
+            )
+
+        messages = build_offer_messages(items, "09:30:00")
+
+        self.assertEqual(4, len(messages))
+        self.assertIn("【YXDR聚合 Top 20 1-5】", messages[0])
+        self.assertIn("【YXDR聚合 Top 20 16-20】", messages[3])
+        self.assertEqual(5, messages[0].count("https://example.com/"))
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 YXDR_BASE_URL = "https://www.yxdr.com"
 YXDR_KUA5_URL = f"{YXDR_BASE_URL}/bijiaqi/dnf/youxibi/kua5"
 DEFAULT_OFFER_LIMIT = 20
+OFFERS_PER_MESSAGE = 5
 
 
 def extract_script_src(html: str) -> str:
@@ -89,6 +90,25 @@ def format_gold_offer(platform_name: str, offer: dict) -> str:
     if url:
         line += f" 🔗 {url}"
     return line
+
+
+def build_offer_messages(offers: list, timestamp: str, chunk_size: int = OFFERS_PER_MESSAGE) -> list:
+    messages = []
+    total = len(offers)
+    for start in range(0, total, chunk_size):
+        end = min(start + chunk_size, total)
+        lines = [
+            "💰 DNF 跨5 实时看板 (YXDR聚合 / 买家视角)",
+            f"📅 统计时间: {timestamp}",
+            "",
+            f"【YXDR聚合 Top {DEFAULT_OFFER_LIMIT} {start + 1}-{end}】",
+        ]
+        for item in offers[start:end]:
+            lines.append(format_gold_offer(item["platform"], item["offer"]))
+        if end == total:
+            lines.append(f" 🔗 聚合页: {YXDR_KUA5_URL}")
+        messages.append("\n".join(lines))
+    return messages
 
 
 def _valid_offer(offer: dict) -> bool:

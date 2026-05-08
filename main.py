@@ -6,9 +6,9 @@ from astrbot.api.star import Context, Star, register
 from astrbot.core.platform import AstrMessageEvent
 
 try:
-    from .yxdr_source import DEFAULT_OFFER_LIMIT, YXDR_KUA5_URL, fetch_yxdr_offers, format_gold_offer
+    from .yxdr_source import build_offer_messages, fetch_yxdr_offers
 except ImportError:
-    from yxdr_source import DEFAULT_OFFER_LIMIT, YXDR_KUA5_URL, fetch_yxdr_offers, format_gold_offer
+    from yxdr_source import build_offer_messages, fetch_yxdr_offers
 
 @register("dnf_gold_monitor", "qingcai", "DNF跨5全平台金价实时看板", "1.1.0")
 class DnfGoldPlugin(Star):
@@ -23,21 +23,20 @@ class DnfGoldPlugin(Star):
         sender_name = event.get_sender_name()
         yield event.plain_result(f"🔍 正在根据 [{sender_name}] 的指示，扫描 YXDR 跨5聚合行情...")
         
-        report = ["💰 DNF 跨5 实时看板 (YXDR聚合 / 买家视角)"]
-        report.append(f"📅 统计时间: {time.strftime('%H:%M:%S')}\n")
+        timestamp = time.strftime("%H:%M:%S")
 
         async with httpx.AsyncClient(headers=self.headers, timeout=15, follow_redirects=True) as client:
             try:
                 offers = await fetch_yxdr_offers(client)
                 if offers:
-                    report.append(f"【YXDR聚合 Top {DEFAULT_OFFER_LIMIT}】")
-                    for item in offers:
-                        report.append(format_gold_offer(item["platform"], item["offer"]))
-                    report.append(f" 🔗 直达: {YXDR_KUA5_URL}\n")
-                else:
-                    report.append("【YXDR聚合】暂未抓到有效挂单，尝试 UU898 兜底...\n")
-                    report.extend(await self._fetch_uu898_fallback(client))
+                    for message in build_offer_messages(offers, timestamp):
+                        yield event.plain_result(message)
+                    return
+
+                report = ["【YXDR聚合】暂未抓到有效挂单，尝试 UU898 兜底...\n"]
+                report.extend(await self._fetch_uu898_fallback(client))
             except Exception:
+                report = []
                 report.append("【YXDR聚合】查询失败，尝试 UU898 兜底...\n")
                 report.extend(await self._fetch_uu898_fallback(client))
 
