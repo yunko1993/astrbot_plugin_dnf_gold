@@ -76,11 +76,19 @@ def offer_ratio(offer: dict) -> float:
     return 0
 
 
+def offer_url(offer: dict) -> str:
+    return offer.get("BuyUrl") or offer.get("ListUrl") or ""
+
+
 def format_gold_offer(platform_name: str, offer: dict) -> str:
     ratio = offer_ratio(offer)
     amount = float(offer.get("Amount") or 0)
     amount_text = "充足" if amount == -1 else f"{amount:.0f}万"
-    return f"   - {platform_name} 1:{ratio:.2f} (1亿≈{10000 / ratio:.1f}元) 库存{amount_text}"
+    line = f"   - {platform_name} 1:{ratio:.2f} (1亿≈{10000 / ratio:.1f}元) 库存{amount_text}"
+    url = offer_url(offer)
+    if url:
+        line += f" 🔗 {url}"
+    return line
 
 
 def _valid_offer(offer: dict) -> bool:

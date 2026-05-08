@@ -6,6 +6,7 @@ from yxdr_source import (
     extract_json_assignment,
     extract_script_src,
     format_gold_offer,
+    offer_url,
     offer_ratio,
 )
 
@@ -39,12 +40,23 @@ class YxdrSourceTest(unittest.TestCase):
         self.assertAlmostEqual(59.4955, offer_ratio(offer), places=4)
 
     def test_format_gold_offer_shows_platform_ratio_and_100m_price(self):
-        offer = {"Price": 0.016808, "Amount": 149783.0, "Money": 2517.55, "Seller": "abc"}
+        offer = {
+            "Price": 0.016808,
+            "Amount": 149783.0,
+            "Money": 2517.55,
+            "Seller": "abc",
+            "BuyUrl": "https://order.dd373.com/default/buy_form.html?id=1",
+        }
 
         self.assertEqual(
-            "   - DD373 1:59.50 (1亿≈168.1元) 库存149783万",
+            "   - DD373 1:59.50 (1亿≈168.1元) 库存149783万 🔗 https://order.dd373.com/default/buy_form.html?id=1",
             format_gold_offer("DD373", offer),
         )
+
+    def test_offer_url_falls_back_to_list_url(self):
+        offer = {"ListUrl": "https://www.dd373.com/s/example.html"}
+
+        self.assertEqual("https://www.dd373.com/s/example.html", offer_url(offer))
 
 
 if __name__ == "__main__":
