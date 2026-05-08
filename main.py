@@ -4,7 +4,11 @@ import time
 from astrbot.api.event import filter
 from astrbot.api.star import Context, Star, register
 from astrbot.core.platform import AstrMessageEvent
-from yxdr_source import DEFAULT_OFFER_LIMIT, YXDR_KUA5_URL, fetch_yxdr_offers, format_gold_offer
+
+try:
+    from .yxdr_source import DEFAULT_OFFER_LIMIT, YXDR_KUA5_URL, fetch_yxdr_offers, format_gold_offer
+except ImportError:
+    from yxdr_source import DEFAULT_OFFER_LIMIT, YXDR_KUA5_URL, fetch_yxdr_offers, format_gold_offer
 
 @register("dnf_gold_monitor", "qingcai", "DNF跨5全平台金价实时看板", "1.1.0")
 class DnfGoldPlugin(Star):
