@@ -7,6 +7,7 @@ from urllib.parse import urljoin
 
 YXDR_BASE_URL = "https://www.yxdr.com"
 YXDR_KUA5_URL = f"{YXDR_BASE_URL}/bijiaqi/dnf/youxibi/kua5"
+DEFAULT_OFFER_LIMIT = 20
 
 
 def extract_script_src(html: str) -> str:
@@ -89,7 +90,7 @@ def _valid_offer(offer: dict) -> bool:
     return 40 < ratio < 120 and price > 0 and (money > 0 or offer.get("Amount") == -1)
 
 
-async def fetch_yxdr_offers(client, page_url: str = YXDR_KUA5_URL, limit: int = 5):
+async def fetch_yxdr_offers(client, page_url: str = YXDR_KUA5_URL, limit: int = DEFAULT_OFFER_LIMIT):
     page = await client.get(page_url)
     page.raise_for_status()
 

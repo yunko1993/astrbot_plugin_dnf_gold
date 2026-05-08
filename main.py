@@ -4,7 +4,7 @@ import time
 from astrbot.api.event import filter
 from astrbot.api.star import Context, Star, register
 from astrbot.core.platform import AstrMessageEvent
-from yxdr_source import YXDR_KUA5_URL, fetch_yxdr_offers, format_gold_offer
+from yxdr_source import DEFAULT_OFFER_LIMIT, YXDR_KUA5_URL, fetch_yxdr_offers, format_gold_offer
 
 @register("dnf_gold_monitor", "qingcai", "DNF跨5全平台金价实时看板", "1.1.0")
 class DnfGoldPlugin(Star):
@@ -24,9 +24,9 @@ class DnfGoldPlugin(Star):
 
         async with httpx.AsyncClient(headers=self.headers, timeout=15, follow_redirects=True) as client:
             try:
-                offers = await fetch_yxdr_offers(client, limit=5)
+                offers = await fetch_yxdr_offers(client)
                 if offers:
-                    report.append("【YXDR聚合 Top 5】")
+                    report.append(f"【YXDR聚合 Top {DEFAULT_OFFER_LIMIT}】")
                     for item in offers:
                         report.append(format_gold_offer(item["platform"], item["offer"]))
                     report.append(f" 🔗 直达: {YXDR_KUA5_URL}\n")

@@ -1,6 +1,7 @@
 import unittest
 
 from yxdr_source import (
+    DEFAULT_OFFER_LIMIT,
     build_secret_signature,
     extract_json_assignment,
     extract_script_src,
@@ -10,6 +11,9 @@ from yxdr_source import (
 
 
 class YxdrSourceTest(unittest.TestCase):
+    def test_default_offer_limit_is_twenty(self):
+        self.assertEqual(20, DEFAULT_OFFER_LIMIT)
+
     def test_extract_script_src_finds_coin_sale_script(self):
         html = '<script src="/cate/1838/CoinSale_yxb_215_0.js?ver=935"></script>'
 
